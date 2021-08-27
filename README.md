@@ -1,4 +1,4 @@
-# Digital Collections QA - digitaldu
+# Digital Collections Transcripts - digitaldu
 
 ## Table of Contents
 
@@ -11,7 +11,7 @@
 
 ### Background
 
-Runs QA on packages that will be ingested into the repository.
+Serves up transcripts during the Repository ingest process.
 
 ### Contributing
 
