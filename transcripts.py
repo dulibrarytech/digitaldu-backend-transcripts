@@ -36,7 +36,9 @@ Get transcript by call number
 @app.route('/api/v1/transcript', methods=['GET'])
 def get_transcript():
     api_key = request.args.get('api_key')
-    transcript = request.args.get('transcript') + '.txt'
+    transcript_arg = request.args.get('call_number') + '.txt'
+
+    transcript = transcript_arg.replace('.', '_')
 
     if api_key is None:
         return json.dumps(['Access denied.'])
