@@ -46,20 +46,21 @@ def get_transcript():
     if transcript_arg is None:
         return json.dumps(dict(error='true', message='Resource not found.')), 404
 
+    # get transcript file names and ignore hidden files
     transcripts = [f for f in os.listdir(transcripts_path + '/' + transcript_arg) if not f.startswith('.')]
 
     for i in transcripts:
-        transcript = transcripts_path + '/' + transcript_arg + i
-        outfile = transcripts_path + transcript_arg + '/' + transcript_arg + '.txt'
 
+        # copy transcript data into new file
         try:
-            with open(outfile, 'a') as outfile:  # file where content will be copied to
+            with open(transcripts_path + transcript_arg + '/' + transcript_arg + '.txt', 'a') as outfile:
                 for transcript_file in transcripts:
                     with open(transcripts_path + transcript_arg + '/' + transcript_file) as file:
                         outfile.write(file.read())
         except:
             return json.dumps(dict(error='true', message='Unable to concatenate transcript data.')), 500
 
+    # remove new line characters from transcript data
     try:
         transcript_text = ''
         with open(transcripts_path + transcript_arg + '/' + transcript_arg + '.txt', 'r') as transcript:
@@ -69,6 +70,10 @@ def get_transcript():
 
     except:
         return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
+
+    # delete transcript import file if it exists
+    if (os.path.isfile(transcripts_path + transcript_arg + '/' + transcript_arg + '.txt')):
+        os.remove(transcripts_path + transcript_arg + '/' + transcript_arg + '.txt')
 
     return json.dumps(dict(transcript=transcript_text, error='false', message='Resource found.')), 200
 
