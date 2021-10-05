@@ -36,22 +36,40 @@ Get transcript by call number
 @app.route('/api/v1/transcript', methods=['GET'])
 def get_transcript():
     api_key = request.args.get('api_key')
-    transcript_arg = request.args.get('call_number') + '.txt'
-
-    transcript = transcript_arg.replace('.', '_')
+    transcript_arg = request.args.get('call_number')
 
     if api_key is None:
-        return json.dumps(['Access denied.'])
+        return json.dumps(dict(error='true', message='Access denied.')), 401
     elif api_key != os.getenv('API_KEY'):
-        return json.dumps(['Access denied.'])
+        return json.dumps(dict(error='true', message='Access denied.')), 401
 
-    transcript_text = ''
-    with open(transcripts_path + '/' + transcript, 'r') as var:
-        for line in var:
-            line = line.replace('\n', ' ')
-            transcript_text += line
+    if transcript_arg is None:
+        return json.dumps(dict(error='true', message='Resource not found.')), 404
 
-    return json.dumps(dict(transcript=transcript_text))
+    transcripts = [f for f in os.listdir(transcripts_path + '/' + transcript_arg) if not f.startswith('.')]
 
+    for i in transcripts:
+        transcript = transcripts_path + '/' + transcript_arg + i
+        outfile = transcripts_path + transcript_arg + '/' + transcript_arg + '.txt'
+
+        try:
+            with open(outfile, 'a') as outfile:  # file where content will be copied to
+                for transcript_file in transcripts:
+                    with open(transcripts_path + transcript_arg + '/' + transcript_file) as file:
+                        outfile.write(file.read())
+        except:
+            return json.dumps(dict(error='true', message='Unable to concatenate transcript data.')), 500
+
+        try:
+            transcript_text = ''
+            with open(transcripts_path + transcript_arg + '/' + transcript_arg + '.txt', 'r') as transcript:
+                for line in transcript:
+                    line = line.replace('\n', ' ')
+                    transcript_text += line
+
+        except:
+            return json.dumps(dict(error='true', message='Resource not found.')), 404
+
+    return json.dumps(dict(transcript=transcript_text, error='false', message='Resource found.')), 200
 
 serve(app, host='0.0.0.0', port=8081)
