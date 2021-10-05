@@ -68,7 +68,7 @@ def get_transcript():
                     transcript_text += line
 
         except:
-            return json.dumps(dict(error='true', message='Resource not found.')), 404
+            return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
 
     return json.dumps(dict(transcript=transcript_text, error='false', message='Resource found.')), 200
 
