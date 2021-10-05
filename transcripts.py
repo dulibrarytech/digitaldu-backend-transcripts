@@ -60,15 +60,15 @@ def get_transcript():
         except:
             return json.dumps(dict(error='true', message='Unable to concatenate transcript data.')), 500
 
-        try:
-            transcript_text = ''
-            with open(transcripts_path + transcript_arg + '/' + transcript_arg + '.txt', 'r') as transcript:
-                for line in transcript:
-                    line = line.replace('\n', ' ')
-                    transcript_text += line
+    try:
+        transcript_text = ''
+        with open(transcripts_path + transcript_arg + '/' + transcript_arg + '.txt', 'r') as transcript:
+            for line in transcript:
+                line = line.replace('\n', ' ')
+                transcript_text += line
 
-        except:
-            return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
+    except:
+        return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
 
     return json.dumps(dict(transcript=transcript_text, error='false', message='Resource found.')), 200
 
