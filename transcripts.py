@@ -47,7 +47,12 @@ def get_transcript():
         return json.dumps(dict(error='true', message='Resource not found.')), 404
 
     # get transcript file names and ignore hidden files
-    transcripts = [f for f in os.listdir(transcripts_path + '/' + transcript_arg) if not f.startswith('.')]
+    try:
+        # TODO: check if folder exists
+        transcripts = [f for f in os.listdir(transcripts_path + '/' + transcript_arg) if not f.startswith('.')]
+    except:
+        # TODO: temp workaround - send 200 so ingest proceeds
+        return json.dumps(dict(error='true', message='Resource not found.')), 200
 
     for i in transcripts:
 
