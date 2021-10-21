@@ -1,1 +1,1 @@
-waitress-serve --call 'qa:app'
+waitress-serve --call 'transcripts:app'
