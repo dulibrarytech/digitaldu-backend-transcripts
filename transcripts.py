@@ -58,9 +58,9 @@ def get_transcript():
 
         # copy transcript data into new file
         try:
-            with open(transcripts_path + transcript_arg + '/' + transcript_arg + '.txt', 'a') as outfile:
+            with open(transcripts_path + '/' + transcript_arg + '/' + transcript_arg + '.txt', 'a') as outfile:
                 for transcript_file in transcripts:
-                    with open(transcripts_path + transcript_arg + '/' + transcript_file) as file:
+                    with open(transcripts_path + '/' + transcript_arg + '/' + transcript_file) as file:
                         outfile.write(file.read())
         except:
             return json.dumps(dict(error='true', message='Unable to concatenate transcript data.')), 500
@@ -68,7 +68,7 @@ def get_transcript():
     # remove new line characters from transcript data
     try:
         transcript_text = ''
-        with open(transcripts_path + transcript_arg + '/' + transcript_arg + '.txt', 'r') as transcript:
+        with open(transcripts_path + '/' + transcript_arg + '/' + transcript_arg + '.txt', 'r') as transcript:
             for line in transcript:
                 line = line.replace('\n', ' ')
                 transcript_text += line
@@ -77,8 +77,8 @@ def get_transcript():
         return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
 
     # delete transcript import file if it exists
-    if (os.path.isfile(transcripts_path + transcript_arg + '/' + transcript_arg + '.txt')):
-        os.remove(transcripts_path + transcript_arg + '/' + transcript_arg + '.txt')
+    if (os.path.isfile(transcripts_path + '/' + transcript_arg + '/' + transcript_arg + '.txt')):
+        os.remove(transcripts_path + '/' + transcript_arg + '/' + transcript_arg + '.txt')
 
     return json.dumps(dict(transcript=transcript_text, error='false', message='Resource found.')), 200
 
