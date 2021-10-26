@@ -1,0 +1,13 @@
+yum install rh-python36
+scl enable rh-python36 bash
+python --version
+mkdir ~/pydev
+cd ~/pydev
+python -m venv py36-venv
+source py36-venv/bin/activate
+cp requirements.txt into ~/pydev
+python -m pip install -r requirements.txt
+
+# Run service
+scl enable rh-python36 bash
+nohup sh start_prod.sh &
