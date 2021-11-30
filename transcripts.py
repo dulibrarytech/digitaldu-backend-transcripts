@@ -22,7 +22,7 @@ def index():
     App Information
     :return: String
     """
-    return 'DigitalDU-Transcripts v0.5.0'
+    return 'DigitalDU-Transcripts v0.6.0'
 
 
 @app.route('/api/v1/transcript', methods=['GET'])
@@ -35,48 +35,36 @@ def get_transcript():
     transcript_arg = request.args.get('call_number').strip()
 
     if api_key is None:
-        return json.dumps(dict(error='true', message='Access denied.')), 401
+        return json.dumps(dict(error='true', message='Access denied.')), 403
     elif api_key != os.getenv('API_KEY'):
-        return json.dumps(dict(error='true', message='Access denied.')), 401
+        return json.dumps(dict(error='true', message='Access denied.')), 403
 
     if transcript_arg is None:
         return json.dumps(dict(error='true', message='Resource not found.')), 404
 
     transcript_ingest_path = transcripts_path + '/' + transcript_arg
 
-    # get transcript file names and ignore hidden files
     try:
         transcripts = [f for f in os.listdir(transcript_ingest_path) if not f.startswith('.')]
     except:
-        return json.dumps(dict(error='true', message='Resource not found.')), 200
+        return json.dumps(dict(error='true', message='Resource not found.')), 404
+
+    transcript_arr = []
 
     for i in transcripts:
 
-        # copy transcript data into new file
         try:
-            with open(transcript_ingest_path + '/' + transcript_arg + '.txt', 'a') as outfile:
-                for transcript_file in transcripts:
-                    with open(transcript_ingest_path + '/' + transcript_file) as file:
-                        outfile.write(file.read())
+            with open(transcript_ingest_path + '/' + i, 'r') as transcript:
+                transcript_text = ''
+                for line in transcript:
+                    transcript_text += line
+
+            transcript_arr.append(dict(call_number=i.replace('.txt', ''), transcript_text=transcript_text))
+
         except:
-            return json.dumps(dict(error='true', message='Unable to concatenate transcript data.')), 500
+            return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
 
-    # remove new line characters from transcript data
-    try:
-        transcript_text = ''
-        with open(transcript_ingest_path + '/' + transcript_arg + '.txt', 'r') as transcript:
-            for line in transcript:
-                line = line.replace('\n', ' ')
-                transcript_text += line
-
-    except:
-        return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
-
-    # delete transcript import file if it exists
-    if os.path.isfile(transcript_ingest_path + '/' + transcript_arg + '.txt'):
-        os.remove(transcript_ingest_path + '/' + transcript_arg + '.txt')
-
-    return json.dumps(dict(transcript=transcript_text, error='false', message='Resource found.')), 200
+    return json.dumps(dict(transcript=transcript_arr, error='false', message='Resource found.')), 200
 
 
 serve(app, host='0.0.0.0', port=8081)
