@@ -64,7 +64,33 @@ def get_transcript():
         except:
             return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
 
-    return json.dumps(dict(transcript=transcript_arr, error='false', message='Resource found.')), 200
+    for i in transcripts:
+
+        # copy transcript data into new file
+        try:
+            with open(transcript_ingest_path + '/' + transcript_arg + '.txt', 'a') as outfile:
+                for transcript_file in transcripts:
+                    with open(transcript_ingest_path + '/' + transcript_file) as file:
+                        outfile.write(file.read())
+        except:
+            return json.dumps(dict(error='true', message='Unable to concatenate transcript data.')), 500
+
+        # remove new line characters from transcript data
+    try:
+        transcript_search = ''
+        with open(transcript_ingest_path + '/' + transcript_arg + '.txt', 'r') as transcript:
+            for line in transcript:
+                line = line.replace('\n', ' ')
+                transcript_search += line
+
+    except:
+        return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
+
+        # delete transcript import file if it exists
+    if os.path.isfile(transcript_ingest_path + '/' + transcript_arg + '.txt'):
+        os.remove(transcript_ingest_path + '/' + transcript_arg + '.txt')
+
+    return json.dumps(dict(transcripts=transcript_arr, transcript_search=transcript_search, error='false', message='Resource found.')), 200
 
 
 serve(app, host='0.0.0.0', port=8081)
