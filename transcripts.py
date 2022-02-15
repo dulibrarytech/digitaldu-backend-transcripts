@@ -50,16 +50,14 @@ def get_transcript():
         return json.dumps(dict(error='true', message='Resource not found.')), 404
 
     transcript_list = []
+    transcript_search = ''
 
     for i in transcripts:
 
         try:
             with open(f'{transcript_ingest_path}/{i}', 'r') as transcript:
-                transcript_text = ''
-                for line in transcript:
-                    transcript_text += line
-
-            transcript_list.append(dict(call_number=i.replace('.txt', ''), transcript_text=transcript_text))
+                transcript_text = transcript.read()
+                transcript_list.append(dict(call_number=i.replace('.txt', ''), transcript_text=transcript_text))
 
         except:
             return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
@@ -77,11 +75,8 @@ def get_transcript():
 
         # remove new line characters from transcript data
     try:
-        transcript_search = ''
         with open(f'{transcript_ingest_path}/{transcript_arg}.txt', 'r') as transcript:
-            for line in transcript:
-                line = line.replace('\n', ' ')
-                transcript_search += line
+            transcript_search = transcript.read().replace('\n', ' ')
 
     except:
         return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
