@@ -1,6 +1,6 @@
 import json
 import os
-from os.path import isfile, join, dirname
+from os.path import join, dirname
 
 from dotenv import load_dotenv
 from flask import Flask, request
@@ -44,8 +44,11 @@ def get_transcript():
 
     transcript_ingest_path = f'{transcripts_path}/{transcript_arg}'
 
+    transcripts = None
     try:
         transcripts = [f for f in os.listdir(transcript_ingest_path) if not f.startswith('.')]
+        transcripts.sort()
+
     except:
         return json.dumps(dict(error='true', message='Resource not found.')), 404
 
@@ -54,36 +57,16 @@ def get_transcript():
 
     for i in transcripts:
 
+        # populate transcript_list and transcript_search
         try:
             with open(f'{transcript_ingest_path}/{i}', 'r') as transcript:
                 transcript_text = transcript.read()
                 transcript_list.append(dict(call_number=i.replace('.txt', ''), transcript_text=transcript_text))
 
+                transcript_search += transcript_text.replace('\n', ' ')
+
         except:
-            return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
-
-    for i in transcripts:
-
-        # copy transcript data into new file
-        try:
-            with open(f'{transcript_ingest_path}/{transcript_arg}.txt', 'a') as outfile:
-                for transcript_file in transcripts:
-                    with open(f'{transcript_ingest_path}/{transcript_file}', 'r') as file:
-                        outfile.write(file.read())
-        except:
-            return json.dumps(dict(error='true', message='Unable to concatenate transcript data.')), 500
-
-        # remove new line characters from transcript data
-    try:
-        with open(f'{transcript_ingest_path}/{transcript_arg}.txt', 'r') as transcript:
-            transcript_search = transcript.read().replace('\n', ' ')
-
-    except:
-        return json.dumps(dict(error='true', message='Unable to read transcript data.')), 500
-
-        # delete transcript import file if it exists
-    if isfile(f'{transcript_ingest_path}/{transcript_arg}.txt'):
-        os.remove(f'{transcript_ingest_path}/{transcript_arg}.txt')
+            return json.dumps(dict(error='true', message='Unable to read or concatenate transcript data.')), 500
 
     return json.dumps(dict(transcripts=transcript_list, transcript_search=transcript_search, error='false', message='Resource found.')), 200
 
