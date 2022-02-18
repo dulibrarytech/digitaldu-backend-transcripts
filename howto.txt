@@ -11,3 +11,5 @@ python -m pip install -r requirements.txt
 # Run service
 scl enable rh-python36 bash
 nohup sh start_prod.sh &
+
+ps aux | grep python
