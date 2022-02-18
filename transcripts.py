@@ -22,7 +22,7 @@ def index():
     App Information
     :return: String
     """
-    return 'DigitalDU-Transcripts v0.6.0'
+    return 'DigitalDU-Transcripts v1.0.0'
 
 
 @app.route('/api/v1/transcript', methods=['GET'])
