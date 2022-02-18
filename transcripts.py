@@ -10,11 +10,14 @@ from waitress import serve
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
+origins = os.getenv('ORIGINS')
 transcripts_path = os.getenv('TRANSCRIPTS_PATH')
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-
+cors = CORS(app, resources={r"/api/*": {
+    "origins": f'{origins}',
+    "methods": ['GET']}
+})
 
 @app.route('/', methods=['GET'])
 def index():
